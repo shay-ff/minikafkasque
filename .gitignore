@@ -1,0 +1,24 @@
+target/
+*.jar
+*.class
+.DS_Store
+data/
+*.log
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+# Documentation (ignore all except README.md)
+ARCHITECTURE.md
+DELIVERABLES.md
+GETTING_STARTED.md
+INDEX.md
+INSTALL.md
+INTERVIEW_PREP.md
+MANIFEST.md
+PROJECT_COMPLETE.txt
+PROJECT_SUMMARY.md
+README_FIRST.txt
+START_HERE.md

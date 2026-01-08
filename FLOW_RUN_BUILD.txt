@@ -1,0 +1,55 @@
+# minikafka Quick Flow & Build Guide
+
+I pulled AI suggestions for structure, but I edited this myself to match how I actually run the project.
+
+## System Flow (Producer → Broker → Consumer)
+1) Producer sends POST /produce with topic, value, optional key + idempotency_key.
+2) Broker selects partition (sticky by key, round-robin otherwise), appends to WAL segment, fsyncs, returns offset.
+3) Consumer joins group via /join, receives partition assignments (sticky rebalance).
+4) Consumer GET /consume from assigned partition starting at committed offset, processes messages.
+5) Consumer POST /commit to persist offset per group/partition; survives restart.
+6) On crash/restart, broker replays WAL segments to recover offsets and idempotency map; consumers resume from committed offsets.
+
+## How to Run (local, single node)
+Prereqs: Java 11+.
+
+Build:
+- bash build.sh
+
+Run broker:
+- bash run.sh 8080 data/kafka-jr
+  (default port 8080; change as needed)
+
+Smoke test:
+- Health: curl http://localhost:8080/health
+- Produce: curl -X POST http://localhost:8080/produce -H "Content-Type: application/json" \
+    -d '{"topic":"demo","value":"dGVzdA==","idempotency_key":"demo-1"}'
+- Join: curl -X POST "http://localhost:8080/join?group=g1&consumer=c1&topic=demo"
+- Consume: curl "http://localhost:8080/consume?group=g1&consumer=c1&topic=demo&partition=0&max_messages=10"
+- Commit: curl -X POST "http://localhost:8080/commit?group=g1&topic=demo&partition=0&offset=1"
+
+## If You’re Building This Project in Phases
+Phase 0: Skeleton
+- Set up package layout and HttpServer with /health only.
+
+Phase 1: Storage
+- Implement LogSegment (size-prefixed append, fsync, read).
+- Implement CommitLog per partition with recovery and rotation.
+
+Phase 2: Producer Path
+- Add ProducerHandler: sticky partitioning, idempotency map, fsync-before-ack.
+- Wire /produce endpoint.
+
+Phase 3: Consumer Path
+- Add ConsumerGroupCoordinator: membership, sticky assignment, offset store (persist).
+- Add ConsumerHandler: /join, /leave, /consume, /commit using LogStore + coordinator.
+
+Phase 4: Hardening
+- Crash-recovery verification (replay WAL, detect partial writes).
+- Concurrency review (ReadWriteLocks, synchronized segment I/O, atomics).
+
+Phase 5: DX & Ops
+- Smoke scripts/cURL snippets, logging, small segment size for tests, basic metrics/health.
+
+Optional Extensions
+- Replication (leader/follower), batched fsync, compression, auth, metrics.

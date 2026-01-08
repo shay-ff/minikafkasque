@@ -1,12 +1,12 @@
-# Kafka-JR: Minimal Kafka-like Distributed Commit Log
+# minikafka: Minimal Kafka-like Distributed Commit Log
 
-A production-grade implementation of a distributed commit log in **vanilla Java** (no frameworks, no Kafka libs) designed to be architecturally correct and interview-defensible.
+I built minikafka as a minimal Kafka-like distributed commit log in **vanilla Java** (no frameworks, no Kafka libs). I leaned on AI to draft pieces of this write-up, but everything here is reviewed and edited by me to stay accurate and readable.
 
 ## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Kafka-JR Broker                         │
+│                     minikafka Broker                        │
 ├─────────────────────────────────────────────────────────────┤
 │  HTTP Server (java.com.sun.net.httpserver)                  │
 │  ├─ /produce       (ProducerHandler)                        │
@@ -484,10 +484,10 @@ data/kafka-jr/
 
 ## Limitations vs. Real Kafka
 
-| Feature | Kafka-JR | Real Kafka | Reason |
-|---------|----------|-----------|--------|
-| **Replication** | Single node | Raft, leader-follower | Kafka-JR is single broker |
-| **Persistence** | fsync per message | Batched fsync | Kafka-JR prioritizes safety |
+| Feature | minikafka | Real Kafka | Reason |
+|---------|-----------|-----------|--------|
+| **Replication** | Single node | Raft, leader-follower | minikafka is single broker |
+| **Persistence** | fsync per message | Batched fsync | minikafka prioritizes safety |
 | **Compression** | None | Snappy, GZIP, LZ4 | Vanilla Java only |
 | **Transactions** | None | Transactional API | Out of scope for this project |
 | **Consumer lag tracking** | Manual | Consumer Metrics API | Not implemented |
@@ -545,13 +545,6 @@ curl -X GET http://localhost:8080/consume \
 
 ---
 
-## Author Notes
+## Scope & Usage
 
-This implementation prioritizes **architectural clarity** and **interview defensibility** over performance:
-- **Clear separation of concerns**: LogStore, CommitLog, Handlers are independent
-- **Production-grade safety**: fsync, crash recovery, deduplication
-- **Testable design**: Each component can be tested independently
-- **Minimal dependencies**: Vanilla Java only
-
-For production use, consider Kafka or RedPanda. For learning distributed systems, this is a great reference implementation.
-# minikafkasque
+The project prioritizes architectural clarity and correctness over throughput or production-grade features. It is intended for learning, demos, and interview preparation rather than high-scale deployment.
