@@ -349,27 +349,38 @@ For exactly-once end-to-end guarantees, applications must:
 
 ## Building & Running
 
-### Build
+### Quick Start
+
+After cloning the repository:
+
 ```bash
-cd /Users/shayan/dev/kafka-jr
+# Build the project
+bash build.sh
+
+# Run the broker
+bash run.sh
+```
+
+The broker will start on `http://localhost:8080` with data stored in `data/kafka-jr/`.
+
+### Health Check
+
+```bash
+curl http://localhost:8080/health
+```
+
+### Manual Build & Run
+
+If you prefer to build and run without shell scripts:
+
+**Build:**
+```bash
 javac -d target/classes -sourcepath src/main/java src/main/java/com/kafka/jr/**/*.java
 ```
 
-Or using jar:
+**Run:**
 ```bash
-cd src/main/java
-javac -d ../../../../target/classes com/kafka/jr/**/*.java
-jar cf ../../../../kafka-jr.jar -C ../../../../target/classes .
-```
-
-### Run
-```bash
-java -cp kafka-jr.jar com.kafka.jr.broker.KafkaJRBroker --port 8080 --data-dir data/kafka-jr
-```
-
-### Health Check
-```bash
-curl http://localhost:8080/health
+java -cp target/classes com.kafka.jr.broker.KafkaJRBroker
 ```
 
 ## Example: Producing Messages

@@ -6,28 +6,18 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="$PROJECT_DIR/src/main/java"
 TARGET_DIR="$PROJECT_DIR/target/classes"
-JAR_FILE="$PROJECT_DIR/kafka-jr.jar"
 
-echo "=== Building Kafka-JR ==="
-echo "Source: $SOURCE_DIR"
-echo "Target: $TARGET_DIR"
+echo "Building kafka-jr..."
 
 # Create target directory
 mkdir -p "$TARGET_DIR"
 
 # Compile all Java files
-echo "Compiling Java files..."
-find "$SOURCE_DIR" -name "*.java" -print0 | xargs -0 javac -d "$TARGET_DIR" -sourcepath "$SOURCE_DIR"
-
-echo "✓ Compilation successful"
-
-# Create JAR
-echo "Creating JAR..."
-cd "$TARGET_DIR"
-jar cfm "$JAR_FILE" /dev/null com/
-cd "$PROJECT_DIR"
-
-echo "✓ JAR created: $JAR_FILE"
-echo ""
-echo "To run:"
-echo "  java -cp $JAR_FILE com.kafka.jr.broker.KafkaJRBroker --port 8080 --data-dir data/kafka-jr"
+if find "$SOURCE_DIR" -name "*.java" -print0 | xargs -0 javac -d "$TARGET_DIR" -sourcepath "$SOURCE_DIR" 2>/dev/null; then
+    echo "Build successful"
+    echo ""
+    echo "Next: bash run.sh"
+else
+    echo "Build failed. Check Java installation and source files."
+    exit 1
+fi
