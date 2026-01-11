@@ -4,6 +4,7 @@ import com.kafka.jr.model.Message;
 import com.kafka.jr.model.TopicPartition;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
